@@ -1,0 +1,2 @@
+(executable
+  (name ads_test))
