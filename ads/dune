@@ -1,2 +1,4 @@
 (executable
-  (name ads_test))
+  (name ads_test)
+  (libraries lwt lwt.unix)
+  (preprocess (pps lwt_ppx)))

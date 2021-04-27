@@ -28,3 +28,65 @@ let fib n =
 
 let () = fib0 := fib
 let fifth_fib = fib 5
+
+(* records with mutable fields
+ * update the mutable field with [<-] syntax
+ *
+ * note: refs are actually just mutable record fields:
+ *  [type 'a ref = { mutable contents: 'a;}]
+ * *)
+type point =
+  { x: int
+  ; y: int
+  ; mutable c: string (* [mutable] is property, not type *)
+  }
+
+let p1 = {x=0; y=1; c="black"}
+let () = p1.c <- "blue"
+
+(* mutable stack ds *)
+module type MutableStack =
+  sig
+    type 'a t
+
+    val empty : unit -> 'a t
+    val push : 'a -> 'a t -> unit
+    val peek : 'a t -> 'a
+    val pop : 'a t -> unit
+  end
+
+module MutableRecordStack : MutableStack = struct
+  type 'a node =
+    { value: 'a
+    ; mutable next: 'a node option
+    }
+
+  type 'a t = {mutable top: 'a node option}
+
+  let empty () = {top=None}
+
+  let push ele s =
+    s.top <- Some {value=ele; next=None}
+
+  let peek s =
+    match s.top with
+    | None -> raise (Failure "bad")
+    | Some node -> node.value
+
+  let pop s =
+    match s.top with
+    | None -> raise (Failure "bad")
+    | Some node -> s.top <- node.next
+end
+
+(* arrays: fixed length, mutable sequences with constant time read/write *)
+let arr = [|0;1;2;|]
+let () = arr.(0) <- 3;; (* change value of index 0 *)
+
+for x=0 to (Array.length arr - 1) do
+  print_int arr.(x);
+done;
+
+for y=(Array.length arr - 1) downto 0 do
+  print_int arr.(y);
+done;

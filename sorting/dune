@@ -1,0 +1,3 @@
+(executable
+ (name sort_test)
+ (libraries base ounit2))
