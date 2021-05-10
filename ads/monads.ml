@@ -49,3 +49,63 @@ module Maybe : Monad = struct
     | None -> None
     | Some v -> f v
 end
+
+(* Writer Monad for ints: *)
+module WriterInt = struct
+  let inc x = x + 1
+  let dec x = x - 1
+  let (>>) f g x = x |> f |> g
+  let id = inc >> dec
+
+  let log (name: string) (f: int -> int) : int -> int * string =
+    fun x -> (f x, Printf.sprintf "Called %s on %i" name x)
+
+  let loggable (name: string) (f: int -> int) : int * string -> int * string =
+    fun (x, s1) ->
+      let (y, s2) = x |> log name f in
+      (y, Printf.sprintf "%s | %s" s1 s2)
+
+  let return (x: int) : int * string =
+    (x, "")
+
+  let (>>=) (v: int * string) (f: int -> int * string) : int * string =
+    let (x, s) = v in
+    let (y, s2) = f x in
+    (y, Printf.sprintf "%s | %s" s s2)
+
+  let loggable' (name: string) (f: int -> int) : int * string -> int * string =
+    fun v ->
+      v >>= log name f
+
+  let inc' : int * string -> int * string =
+    loggable' "inc" inc
+
+  let dec' : int * string -> int * string =
+    loggable' "dec" dec
+
+  let id' = inc' >> dec'
+end
+
+(* general Writer Monad: *)
+module WriterMonad : Monad = struct
+  type 'a t = 'a * string
+
+  let return x = (x, "")
+
+  let (>>=) x f =
+    let (v, s) = x in
+    let (v2, s2) = f v in
+    (v2, s ^ s2)
+end
+
+(*
+ * Some monad rules:
+ * [return x >>= f] is [f x]
+ * [m >>= return] is [m]
+ * [(m >>= f) >>= g)] is m >>= (fun x -> f x >>= g)
+ *
+ * or equivalently using compose (>=>):
+ * [return >=> f] is [f]
+ * [f >=> return] is [f]
+ * [(f >=> g) >=> h] is [f >=> (g >=> h)]
+ *)

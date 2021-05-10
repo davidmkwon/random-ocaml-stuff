@@ -69,7 +69,7 @@ end
 (* Lwt exposes a conceptually similar api of promises: *)
 open Lwt
 
-let promise, resolver = Lwt.wait() (* same as make() *)
+let (promise: int Lwt.t), resolver = Lwt.wait () (* same as make() *)
 (* example: resolve a promise
 # Lwt.state p;;
 - : int Lwt.state = Lwt.Sleep
@@ -83,6 +83,7 @@ let promise, resolver = Lwt.wait() (* same as make() *)
 # Lwt.wakeup r 42;;
 Exception: Invalid_argument "Lwt.wakeup".
 *)
+let () = ignore promise
 
 open Lwt_io
 let stdin_promise = read_line stdin
@@ -92,9 +93,10 @@ let _ = Lwt.state stdin_promise (* will return [Lwt.Return (the stdin)] *)
 (* callbacks: functions that are called when a promise is resolved *)
 let print_the_string s = Lwt_io.printf "string: %s\n" s
 let promise = read_line stdin
+let () = ignore promise
 
 (* register [print_the_string] as callback for [promise] *)
-let () = ignore(Lwt.bind promise print_the_string)
+let () = ignore (Lwt.bind promise print_the_string)
 
 (* [bind] does the following: when [promise] is resolved, it will execute the
  * callback function. the callback function will return another promise, of type
@@ -105,12 +107,14 @@ let promise =
   Lwt.bind (read_line stdin) (fun s1 ->
       Lwt.bind (read_line stdin) (fun s2 ->
           Lwt_io.printf "string: %s\n" (s1^s2)))
+let () = ignore promise
 
 (* another way to write the above is with [>>=] operator: *)
 let promise =
   read_line stdin >>= fun s1 ->
   read_line stdin >>= fun s2 ->
   Lwt_io.printf "string: %s\n" (s1^s2)
+let () = ignore promise
 
 (* YET another way to write the above is with [>>=] operator (i think this is
  * more idiomatic: *)
