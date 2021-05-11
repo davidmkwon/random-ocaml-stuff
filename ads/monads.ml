@@ -97,6 +97,16 @@ module WriterMonad : Monad = struct
     let (v2, s2) = f v in
     (v2, s ^ s2)
 end
+(**
+ * okay, so i guess the whole "unused variable declaration" error happens
+ * because when you "export" this file in any type of way (which includes making
+ * it a library because that implies other files are going to use it), the
+ * compiler checks that WriterMonad is essentially a Monad--there are no other
+ * types in WriterMonad that aren't defined in Monad. So that's why the only way
+ * you can have any extra function definitions in WriterMonad is if you make use
+ * of them internally in the Monad functions' definitions, as if it's not used
+ * in this way internally, since it's not exported, it's an unused variable.
+ * *)
 
 (*
  * Some monad rules:

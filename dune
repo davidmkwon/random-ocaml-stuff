@@ -2,5 +2,5 @@
 
 (executable
   (name main)
-  (libraries ads)
+  (libraries dictionary)
   (preprocess (pps ppx_sexp_conv)))

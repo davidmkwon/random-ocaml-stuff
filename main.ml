@@ -1,13 +1,13 @@
-open Ads
-open Base
+let hash x = x
+let compare = Stdlib.compare
 
-let () = Stdlib.Printf.printf "%d\n" (Memo.fib_mem 3)
+let dict = Dictionary.create ~hash:hash ~compare:compare
 
-type t = {
-  foo: int;
-  bar: int;
-} [@@deriving sexp]
+let () = Dictionary.add dict ~key:1 ~data:3
+let () = Dictionary.add dict ~key:4 ~data:5
+let () = Dictionary.add dict ~key:9 ~data:10
+let () = Dictionary.add dict ~key:1 ~data:13
 
-let t = {foo=3; bar=5}
-
-let _ = Base.(t |> sexp_of_t |> Sexp.to_string |> Stdlib.print_endline)
+let () = Printf.printf "dictionary length %d\n" (Dictionary.length dict)
+let () = Dictionary.iter dict ~f:(fun k d ->
+    Printf.printf "key: %d, val: %d\n" k d)
