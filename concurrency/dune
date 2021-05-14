@@ -1,0 +1,4 @@
+(executable
+  (name duckduck)
+  (libraries async core uri yojson cohttp-async textwrap)
+  (preprocess (pps ppx_let)))
